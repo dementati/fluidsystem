@@ -10,11 +10,7 @@ class UniformGridGeometry:
 
     def __init__(self, numElements = None, vMin = None, vMax = None, powerOf2 = None):
         if numElements is None and vMin is None and vMax is None:
-            self.minCorner = np.zeros(3)
-            self.gridExtent = np.zeros(3)
-            self.cellExtent  = np.zeros(3)
-            self.cellsPerExtent = np.zeros(3)
-            self.numPoints = np.zeros(3)
+			self.clear()
         else:
             self.defineShape(numElements, vMin, vMax, powerOf2)
 
@@ -46,12 +42,25 @@ class UniformGridGeometry:
 
         self.precomputeSpacing()
 
+	def decimate(self, src, decimation):
+		self.gridExtent = src.gridExtent
+		self.minCorner = src.minCorner
+		self.numPoints = src.getNumCells() / decimation + 1
+
+		if decimation > 1:
+			self.numPoints = np.maximum(2 * np.ones(3), self.numPoints)
+
+		self.precomputeSpacing()
+
+	def copyShape(self, src):
+		self.decimate(src, 1)
+
     def precomputeSpacing(self):
         self.cellExtent = self.gridExtent / self.getNumCells()
         self.cellsPerExtent = self.getNumCells() / self.gridExtent
 
         if 0 == self.gridExtent[2]:
-            self.cellsPerExtent = 1/sys.float_info.min
+            self.cellsPerExtent[2] = 1/sys.float_info.min
 
     def getNumCells(self):
         return self.numPoints - 1
@@ -68,3 +77,10 @@ class UniformGridGeometry:
 
     def getGridCapacity(self):
         return np.prod(self.numPoints)
+
+	def clear(self):
+		self.minCorner = np.zeros(3)
+		self.gridExtent = np.zeros(3)
+		self.cellExtent  = np.zeros(3)
+		self.cellsPerExtent = np.zeros(3)
+		self.numPoints = np.zeros(3)
