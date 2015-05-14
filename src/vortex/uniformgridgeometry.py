@@ -6,7 +6,7 @@ from .. import mathutil as mu
 
 class UniformGridGeometry:
 
-    nudge = 1 + sys.float_info.epsilon
+    nudge = 1 + np.finfo(float).eps
 
     def __init__(self, numElements = None, vMin = None, vMax = None, powerOf2 = None):
         if numElements is None and vMin is None and vMax is None:
@@ -60,7 +60,7 @@ class UniformGridGeometry:
         self.cellsPerExtent = self.getNumCells() / self.gridExtent
 
         if 0 == self.gridExtent[2]:
-            self.cellsPerExtent[2] = 1/sys.float_info.min
+            self.cellsPerExtent[2] = 1/np.finfo(float).tiny
 
     def getNumCells(self):
         return self.numPoints - 1
