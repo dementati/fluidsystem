@@ -127,23 +127,17 @@ class UniformGridTest(unittest.TestCase):
         # GIVEN
         grid = UniformGrid(8, np.zeros(3), 2*np.ones(3), False)
         grid.initialize(0)
-        grid.insert(np.ones(3), 1)
+        grid.insert(np.zeros(3), 1)
 
         # THEN
         for coord in itertools.product(range(grid.numPoints[0]), range(grid.numPoints[1]), range(grid.numPoints[2])):
             npCoord = np.array(coord)
-            if coord == (1, 1, 1):
+            if coord == (0, 0, 0):
                 self.assertTrue(np.allclose(1, grid.interpolate(npCoord)))
             else:
                 self.assertTrue(np.allclose(0, grid.interpolate(npCoord)))
 
-        self.assertTrue(np.allclose(0.5, grid.interpolate(np.array([0.5, 1, 1]))))
-        self.assertTrue(np.allclose(0.5, grid.interpolate(np.array([1, 0.5, 1]))))
-        self.assertTrue(np.allclose(0.5, grid.interpolate(np.array([1, 1, 0.5]))))
-        self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([0.5, 0.5, 1]))))
-        self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([0.5, 1, 0.5]))))
-        self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([1, 0.5, 0.5]))))
-        self.assertTrue(np.allclose(0.125, grid.interpolate(np.array([0.5, 0.5, 0.5]))))
+        self.assertTrue(np.allclose(0, grid.interpolate(np.array([1.5, 1.5, 1.5]))))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
