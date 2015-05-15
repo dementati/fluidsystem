@@ -31,7 +31,11 @@ class UniformGridGeometry(object):
         au.assertVec3(vMax, "vMax")
         assert isinstance(powerOf2, bool), "powerOf2 must be a boolean"
 
-        logger.debug("defineShape called")
+        logger.debug("defineShape called with:")
+        logger.debug("numElements = %d" % numElements)
+        logger.debug("vMin = %s" % vMin)
+        logger.debug("vMax = %s" % vMax)
+        logger.debug("powerOf2 = %s" % str(powerOf2))
 
         self.setMinCorner(vMin)
 
@@ -58,7 +62,10 @@ class UniformGridGeometry(object):
         logger.debug("cellVolumeCubeRoot = %f" % cellVolumeCubeRoot)
 
         numCells = np.maximum(np.ones(3), self.gridExtent * cellVolumeCubeRoot + 0.5).astype(int)
-        
+      
+        logger.debug("self.gridExtent * cellVolumeCubeRoot + 0.5 = %s", self.gridExtent * cellVolumeCubeRoot + 0.5)
+        logger.debug("numCells = %s" % numCells)
+
         if powerOf2:
             numCells = mu.nearestPowerOf2(numCells)
 
