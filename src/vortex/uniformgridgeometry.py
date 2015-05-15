@@ -80,13 +80,14 @@ class UniformGridGeometry(object):
         assert isinstance(src, UniformGridGeometry), "src must be a UniformGridGeometry"
         assert isinstance(decimation, int), "decimation must be an integer"
         assert decimation > 0, "decimation must be positive"
+        assert decimation == 1 or np.all(src.getNumCells() > 1), "cannot decimate a single-cell axis"
 
         self.setGridExtent(src.gridExtent)
         self.setMinCorner(src.minCorner)
-        self.setNumPoints(src.getNumCells() / decimation + 1)
+        self.setNumPoints((src.getNumCells() / decimation).astype(int) + 1)
 
         if decimation > 1:
-            self.setNumPoints(np.maximum(2 * np.ones(3), self.numPoints))
+            self.setNumPoints(np.maximum((2 * np.ones(3)).astype(int), self.numPoints))
 
         self.precomputeSpacing()
 
