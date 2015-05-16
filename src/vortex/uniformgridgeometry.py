@@ -17,9 +17,14 @@ class UniformGridGeometry(object):
         else:
             assert isinstance(numElements, int), "numElements must be an integer"
             assert numElements > 0, "numElements must be non-negative"
-            au.assertVec3(vMin, "vMin")
-            au.assertVec3(vMax, "vMax")
+            au.assertVec2or3(vMin, "vMin")
+            au.assertVec2or3(vMax, "vMax")
+            assert len(vMin) == len(vMax), "vMin and vMax must be of the same dimensions"
             assert isinstance(powerOf2, bool), "powerOf2 must be a boolean"
+
+            if len(vMin) == 2:
+                vMin = np.array([vMin[0], vMin[1], 0])
+                vMax = np.array([vMax[0], vMax[1], 0])
 
             self.defineShape(numElements, vMin, vMax, powerOf2)
 
@@ -38,39 +43,34 @@ class UniformGridGeometry(object):
         logger.debug("powerOf2 = %s" % str(powerOf2))
 
         self.setMinCorner(vMin)
-
-        logger.debug("set minCorner to %s" % self.minCorner)
-
         self.setGridExtent((vMax - vMin) * UniformGridGeometry.nudge)
-       
-        logger.debug("set gridExtent to %s" % self.gridExtent)
 
-        sizeEffective = self.gridExtent
+        sizeEffective = np.copy(self.gridExtent)
         numDims = 3
         for i in range(3):
             if 0 == sizeEffective[i]:
                 sizeEffective[i] = 1
                 self.gridExtent[i] = 0
                 numDims -= 1
+        logger.debug("sizeEffective = %s" % sizeEffective)
 
         volume = np.prod(sizeEffective)
-
         logger.debug("volume = %f" % volume)
 
         cellVolumeCubeRoot = np.power( volume/numElements, -1/numDims )
-
         logger.debug("cellVolumeCubeRoot = %f" % cellVolumeCubeRoot)
 
         numCells = np.maximum(np.ones(3), self.gridExtent * cellVolumeCubeRoot + 0.5).astype(int)
-      
         logger.debug("self.gridExtent * cellVolumeCubeRoot + 0.5 = %s", self.gridExtent * cellVolumeCubeRoot + 0.5)
         logger.debug("numCells = %s" % numCells)
 
         if powerOf2:
             numCells = mu.nearestPowerOf2(numCells)
+            logger.debug("rounded to nearest power of 2, numCells = %s" % numCells)
 
         while np.prod(numCells) >= numElements * 8:
-            numCells = np.maximum(np.ones(3), numCells/2)
+            numCells = np.maximum(np.ones(3), numCells/2).astype(int)
+            logger.debug("np.prod(numCells) >= numElements * 8, numCells = %s" % numCells)
 
         self.setNumPoints(numCells + 1)
 
@@ -98,16 +98,20 @@ class UniformGridGeometry(object):
 
     def precomputeSpacing(self):
         self.setCellExtent(self.gridExtent / self.getNumCells())
-        cellsPerExtent = self.getNumCells() / self.gridExtent
 
+        cellsPerExtent = np.zeros(3)
         if 0 == self.gridExtent[2]:
+            cellsPerExtent[:2] = self.getNumCells()[:2] / self.gridExtent[:2]
             cellsPerExtent[2] = 1/np.finfo(float).tiny
+        else:
+            cellsPerExtent = self.getNumCells() / self.gridExtent
 
         self.setCellsPerExtent(cellsPerExtent)
 
     def setNumPoints(self, numPoints):
         au.assertIntVec3(numPoints, "numPoints")
         self.numPoints = numPoints
+        logger.debug("set numPoints to %s" % self.numPoints)
 
     def getNumCells(self):
         return self.numPoints - 1
@@ -115,18 +119,22 @@ class UniformGridGeometry(object):
     def setCellsPerExtent(self, cellsPerExtent):
         au.assertVec3(cellsPerExtent, "cellsPerExtent")
         self.cellsPerExtent = cellsPerExtent
+        logger.debug("set cellsPerExtent to %s" % self.cellsPerExtent)
 
     def setMinCorner(self, minCorner):
         au.assertVec3(minCorner, "minCorner")
         self.minCorner = minCorner
+        logger.debug("set minCorner to %s" % self.minCorner)
 
     def setGridExtent(self, gridExtent):
         au.assertVec3(gridExtent, "gridExtent")
         self.gridExtent = gridExtent
+        logger.debug("set gridExtent to %s" % self.gridExtent)
 
     def setCellExtent(self, cellExtent):
         au.assertVec3(cellExtent, "cellExtent")
         self.cellExtent = cellExtent
+        logger.debug("set cellExtent to %s" % self.cellExtent)
 
     def indicesOfPosition(self, position):
         au.assertVec3(position, "position")

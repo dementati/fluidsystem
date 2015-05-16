@@ -140,5 +140,4 @@ class UniformGridTest(unittest.TestCase):
         self.assertTrue(np.allclose(0, grid.interpolate(np.array([1.5, 1.5, 1.5]))))
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     unittest.main()
