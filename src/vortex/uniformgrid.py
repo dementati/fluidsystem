@@ -111,3 +111,9 @@ class UniformGrid(UniformGridGeometry):
 
     def assertInitialized(self):
         assert bool(self.contents), "Grid has not been initialized"
+
+    def __getitem__(self, index):
+        return self.contents[index]
+
+    def __getitem__(self, index, value):
+        self.contents[index] = value
