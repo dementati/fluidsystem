@@ -139,6 +139,28 @@ class UniformGridTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(0, grid.interpolate(np.array([1.5, 1.5, 1.5]))))
 
+    def test_interpolate2x2NonZeroMinCorner(self):
+        # GIVEN
+        grid = UniformGrid(1, np.ones(3), 2*np.ones(3), False)
+        grid.initialize(0)
+        grid.insert(np.ones(3), 1)
+
+        # THEN
+        for coord in itertools.product(range(1, grid.numPoints[0] + 1), range(1, grid.numPoints[1] + 1), range(1, grid.numPoints[2] + 1)):
+            npCoord = np.array(coord)
+            if coord == (1, 1, 1):
+                self.assertTrue(np.allclose(1, grid.interpolate(npCoord)))
+            else:
+                self.assertTrue(np.allclose(0, grid.interpolate(npCoord)))
+
+        self.assertTrue(np.allclose(0.5, grid.interpolate(np.array([1.5, 1, 1]))))
+        self.assertTrue(np.allclose(0.5, grid.interpolate(np.array([1, 1.5, 1]))))
+        self.assertTrue(np.allclose(0.5, grid.interpolate(np.array([1, 1, 1.5]))))
+        self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([1.5, 1.5, 1]))))
+        self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([1.5, 1, 1.5]))))
+        self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([1, 1.5, 1.5]))))
+        self.assertTrue(np.allclose(0.125, grid.interpolate(np.array([1.5, 1.5, 1.5]))))
+
     def test_decimateSingleCellUnitDecimation(self):
         # GIVEN
         srcGrid = UniformGrid(1, np.zeros(3), np.ones(3), False)

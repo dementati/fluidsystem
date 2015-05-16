@@ -138,6 +138,7 @@ class UniformGridGeometry(object):
 
     def indicesOfPosition(self, position):
         au.assertVec3(position, "position")
+        self.assertWithinGrid(position)
         posRel = position - self.minCorner
         return (posRel * self.cellsPerExtent).astype(int)
 
@@ -157,6 +158,10 @@ class UniformGridGeometry(object):
 
     def getGridCapacity(self):
         return np.prod(self.numPoints)
+
+    def assertWithinGrid(self, position):
+        assert np.all(position >= self.minCorner), "position must be within the region of this grid"
+        assert np.all(position <= self.minCorner + self.gridExtent), "position must be within the region of this grid"
 
     def clear(self):
         self.setMinCorner(np.zeros(3))

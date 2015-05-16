@@ -141,6 +141,19 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertEquals(24, gridGeometry.getGridCapacity())
         self.assertTrue(np.allclose(np.array([5, 1, 1]), gridGeometry.getNumCells()))
 
+    def test_constructSingleElement1x1x1NonZeroMinCorner(self):
+        # WHEN
+        gridGeometry = UniformGridGeometry(1, np.ones(3), 2*np.ones(3), False)
+
+        # THEN
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.minCorner))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.gridExtent))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellExtent))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellsPerExtent))
+        self.assertTrue(np.allclose(2*np.ones(3), gridGeometry.numPoints))
+        self.assertEquals(8, gridGeometry.getGridCapacity())
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.getNumCells()))
+
     def test_indicesOfPosition(self):
         # GIVEN 
         gridGeometry = UniformGridGeometry(8, np.zeros(3), 2*np.ones(3), False)

@@ -2,6 +2,9 @@ from __future__ import division
 import numpy as np
 from uniformgridgeometry import UniformGridGeometry
 from .. import assertutil as au
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UniformGrid(UniformGridGeometry):
 
@@ -36,12 +39,23 @@ class UniformGrid(UniformGridGeometry):
         au.assertVec3(position, "position")
         self.assertInitialized()
 
+        logger.debug("interpolate called with {position: %s}" % position) 
+
         indices = self.indicesOfPosition(position)
+        logger.debug("indices = %s" % indices)
+
         minCorner = self.positionFromIndices(indices)
+        logger.debug("minCorner = %s" % indices)
 
         offsetX0Y0Z0 = self.offsetFromIndices(indices)
+        logger.debug("offsetX0Y0Z0 = %d" % offsetX0Y0Z0)
+
         diff = position - minCorner
+        logger.debug("diff = %s" % diff)
+
         tween = diff * self.cellsPerExtent
+        logger.debug("tween = %s" % tween)
+
         oneMinusTween = np.ones(3) - tween
         numXY = np.prod(self.numPoints[:2])
         offsetX1Y0Z0  = offsetX0Y0Z0 + 1 
