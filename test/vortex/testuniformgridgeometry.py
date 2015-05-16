@@ -1,3 +1,5 @@
+from __future__ import division
+
 import unittest
 from ...src.vortex.uniformgridgeometry import UniformGridGeometry
 import numpy as np
@@ -8,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class UniformGridGeometryTest(unittest.TestCase):
 
-    def test_constructSingleCell(self):
+    def test_constructSingleElement1x1x1(self):
         # WHEN
         gridGeometry = UniformGridGeometry(1, np.zeros(3), np.ones(3), False)
 
@@ -21,7 +23,7 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertEquals(8, gridGeometry.getGridCapacity())
         self.assertTrue(np.allclose(np.ones(3), gridGeometry.getNumCells()))
 
-    def test_construct2x2x2(self):
+    def test_construct8Elements2x2x2(self):
         # WHEN
         gridGeometry = UniformGridGeometry(8, np.zeros(3), 2*np.ones(3), False)
 
@@ -34,7 +36,7 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertEquals(27, gridGeometry.getGridCapacity())
         self.assertTrue(np.allclose(2*np.ones(3), gridGeometry.getNumCells()))
 
-    def test_construct2x2(self):
+    def test_construct4Elements2x2(self):
         # WHEN 
         gridGeometry = UniformGridGeometry(4, np.zeros(2), 2*np.ones(2), False)
 
@@ -47,12 +49,11 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertEquals(18, gridGeometry.getGridCapacity())
         self.assertTrue(np.allclose(np.array([2, 2, 1]), gridGeometry.getNumCells()))
 
-    def test_constructSingleElementToPowerOf2(self):
+    def test_constructSingleElement1x1x1ToPowerOf2(self):
         # WHEN
         gridGeometry = UniformGridGeometry(1, np.zeros(3), np.ones(3), True)
 
-        # THEN grid size is first rounded up to 2x2x2, but the size is identified as excessive to hold the number of 
-        #   elements, so the grid shrinks back to 1x1x1
+        # THEN 
         self.assertTrue(np.allclose(np.zeros(3), gridGeometry.minCorner))
         self.assertTrue(np.allclose(np.ones(3), gridGeometry.gridExtent))
         self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellExtent))
@@ -61,7 +62,7 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertEquals(8, gridGeometry.getGridCapacity())
         self.assertTrue(np.allclose(np.ones(3), gridGeometry.getNumCells()))
 
-    def test_constructTwoElements(self):
+    def test_constructTwoElements1x1x1(self):
         # WHEN
         gridGeometry = UniformGridGeometry(2, np.zeros(3), np.ones(3), False)
 
@@ -75,18 +76,57 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertTrue(np.allclose(np.ones(3), gridGeometry.getNumCells()))
 
 
-    def test_constructTwoElementsToPowerOf2(self):
+    def test_construct2Elements1x1x1ToPowerOf2(self):
         # WHEN
         gridGeometry = UniformGridGeometry(2, np.zeros(3), np.ones(3), True)
 
-        # THEN 
+        # THEN
         self.assertTrue(np.allclose(np.zeros(3), gridGeometry.minCorner))
         self.assertTrue(np.allclose(np.ones(3), gridGeometry.gridExtent))
-        self.assertTrue(np.allclose(0.5*np.ones(3), gridGeometry.cellExtent))
-        self.assertTrue(np.allclose(2*np.ones(3), gridGeometry.cellsPerExtent))
-        self.assertTrue(np.allclose(3*np.ones(3), gridGeometry.numPoints))
-        self.assertEquals(27, gridGeometry.getGridCapacity())
-        self.assertTrue(np.allclose(2*np.ones(3), gridGeometry.getNumCells()))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellExtent))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellsPerExtent))
+        self.assertTrue(np.allclose(2*np.ones(3), gridGeometry.numPoints))
+        self.assertEquals(8, gridGeometry.getGridCapacity())
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.getNumCells()))
+
+    def test_construct2Elements2x1x1(self):
+        # WHEN
+        gridGeometry = UniformGridGeometry(2, np.zeros(3), np.array([2, 1, 1]), False)
+
+        # THEN 
+        self.assertTrue(np.allclose(np.zeros(3), gridGeometry.minCorner))
+        self.assertTrue(np.allclose(np.array([2,1,1]), gridGeometry.gridExtent))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellExtent))
+        self.assertTrue(np.allclose(np.ones(3), gridGeometry.cellsPerExtent))
+        self.assertTrue(np.allclose(np.array([3, 2, 2]), gridGeometry.numPoints))
+        self.assertEquals(12, gridGeometry.getGridCapacity())
+        self.assertTrue(np.allclose(np.array([2, 1, 1]), gridGeometry.getNumCells()))
+
+    def test_construct6Elements3x2x1ToPowerOf2(self):
+        # WHEN
+        gridGeometry = UniformGridGeometry(6, np.zeros(3), np.array([3, 2, 1]), True)
+
+        # THEN 
+        self.assertTrue(np.allclose(np.zeros(3), gridGeometry.minCorner))
+        self.assertTrue(np.allclose(np.array([3, 2, 1]), gridGeometry.gridExtent))
+        self.assertTrue(np.allclose(np.array([3/4, 1, 1]), gridGeometry.cellExtent))
+        self.assertTrue(np.allclose(np.array([4/3, 1, 1]), gridGeometry.cellsPerExtent))
+        self.assertTrue(np.allclose(np.array([5, 3, 2]), gridGeometry.numPoints))
+        self.assertEquals(30, gridGeometry.getGridCapacity())
+        self.assertTrue(np.allclose(np.array([4, 2, 1]), gridGeometry.getNumCells()))
+
+    def test_constructSingleElement2x1x1(self):
+        # WHEN
+        gridGeometry = UniformGridGeometry(1, np.zeros(3), np.array([2, 1, 1]), True)
+
+        # THEN
+        self.assertTrue(np.allclose(np.zeros(3), gridGeometry.minCorner))
+        self.assertTrue(np.allclose(np.array([2, 1, 1]), gridGeometry.gridExtent))
+        self.assertTrue(np.allclose(np.array([1, 1, 1]), gridGeometry.cellExtent))
+        self.assertTrue(np.allclose(np.array([1, 1, 1]), gridGeometry.cellsPerExtent))
+        self.assertTrue(np.allclose(np.array([3, 2, 2]), gridGeometry.numPoints))
+        self.assertEquals(12, gridGeometry.getGridCapacity())
+        self.assertTrue(np.allclose(np.array([2, 1, 1]), gridGeometry.getNumCells()))
 
 
     def test_indicesOfPosition(self):

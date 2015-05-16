@@ -60,7 +60,7 @@ class UniformGridGeometry(object):
         cellVolumeCubeRoot = np.power( volume/numElements, -1/numDims )
         logger.debug("cellVolumeCubeRoot = %f" % cellVolumeCubeRoot)
 
-        numCells = np.maximum(np.ones(3), self.gridExtent * cellVolumeCubeRoot + 0.5).astype(int)
+        numCells = np.maximum(np.ones(3), (self.gridExtent * cellVolumeCubeRoot + 0.5).astype(int)).astype(int)
         logger.debug("self.gridExtent * cellVolumeCubeRoot + 0.5 = %s", self.gridExtent * cellVolumeCubeRoot + 0.5)
         logger.debug("numCells = %s" % numCells)
 

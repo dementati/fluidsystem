@@ -7,9 +7,6 @@ def _nearestPowerOf2(x):
     if x == 0:
         return 0
 
-    if x <= 1:
-        return 2
-
     return 1 << (1 - int(math.ceil(x))).bit_length()
 
 __nearestPowerOf2 = np.vectorize(_nearestPowerOf2)
