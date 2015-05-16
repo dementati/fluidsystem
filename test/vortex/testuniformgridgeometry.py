@@ -128,6 +128,18 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertEquals(12, gridGeometry.getGridCapacity())
         self.assertTrue(np.allclose(np.array([2, 1, 1]), gridGeometry.getNumCells()))
 
+    def test_constructSingleElement30x1x1(self):
+        # WHEN
+        gridGeometry = UniformGridGeometry(1, np.zeros(3), np.array([30, 1, 1]), False)
+
+        # THEN
+        self.assertTrue(np.allclose(np.zeros(3), gridGeometry.minCorner))
+        self.assertTrue(np.allclose(np.array([30, 1, 1]), gridGeometry.gridExtent))
+        self.assertTrue(np.allclose(np.array([6, 1, 1]), gridGeometry.cellExtent))
+        self.assertTrue(np.allclose(np.array([1/6, 1, 1]), gridGeometry.cellsPerExtent))
+        self.assertTrue(np.allclose(np.array([6, 2, 2]), gridGeometry.numPoints))
+        self.assertEquals(24, gridGeometry.getGridCapacity())
+        self.assertTrue(np.allclose(np.array([5, 1, 1]), gridGeometry.getNumCells()))
 
     def test_indicesOfPosition(self):
         # GIVEN 
@@ -194,6 +206,21 @@ class UniformGridGeometryTest(unittest.TestCase):
         self.assertTrue(np.allclose(2*np.ones(3), decGrid.numPoints))
         self.assertTrue(np.allclose(2*np.ones(3), decGrid.cellExtent))
         self.assertTrue(np.allclose(0.5*np.ones(3), decGrid.cellsPerExtent))
+
+    def test_copyShapeSingleCell(self):
+        # GIVEN
+        srcGrid = UniformGridGeometry(1, np.zeros(3), np.ones(3), False)
+        decGrid = UniformGridGeometry()
+
+        # WHEN
+        decGrid.copyShape(srcGrid)
+
+        # THEN
+        self.assertTrue(np.allclose(srcGrid.gridExtent, decGrid.gridExtent))
+        self.assertTrue(np.allclose(srcGrid.minCorner, decGrid.minCorner))
+        self.assertTrue(np.allclose(srcGrid.numPoints , decGrid.numPoints))
+        self.assertTrue(np.allclose(srcGrid.cellExtent, decGrid.cellExtent))
+        self.assertTrue(np.allclose(srcGrid.cellsPerExtent, decGrid.cellsPerExtent))
 
 if __name__ == '__main__':
     unittest.main()

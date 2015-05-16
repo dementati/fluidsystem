@@ -5,11 +5,12 @@ from .. import assertutil as au
 
 class UniformGrid(UniformGridGeometry):
 
-    def __init__(self, numElements, vMin, vMax, powerOf2):
-        assert isinstance(numElements, int), "numElements must be an integer"
-        au.assertVec3(vMin, "vMin")
-        au.assertVec3(vMax, "vMax")
-        assert isinstance(powerOf2, bool), "powerOf2 must be a boolean"
+    def __init__(self, numElements=None, vMin=None, vMax=None, powerOf2=None):
+        if numElements != None or vMin != None or vMax != None or powerOf2 != None:
+            assert isinstance(numElements, int), "numElements must be an integer"
+            au.assertVec3(vMin, "vMin")
+            au.assertVec3(vMax, "vMax")
+            assert isinstance(powerOf2, bool), "powerOf2 must be a boolean"
 
         super(UniformGrid, self).__init__(numElements, vMin, vMax, powerOf2)
 

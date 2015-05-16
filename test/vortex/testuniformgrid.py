@@ -139,5 +139,35 @@ class UniformGridTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(0, grid.interpolate(np.array([1.5, 1.5, 1.5]))))
 
+    def test_decimateSingleCellUnitDecimation(self):
+        # GIVEN
+        srcGrid = UniformGrid(1, np.zeros(3), np.ones(3), False)
+        decGrid = UniformGrid()
+
+        # WHEN
+        decGrid.decimate(srcGrid, 1)
+
+        # THEN
+        self.assertTrue(np.allclose(srcGrid.gridExtent, decGrid.gridExtent))
+        self.assertTrue(np.allclose(srcGrid.minCorner, decGrid.minCorner))
+        self.assertTrue(np.allclose(srcGrid.numPoints , decGrid.numPoints))
+        self.assertTrue(np.allclose(srcGrid.cellExtent, decGrid.cellExtent))
+        self.assertTrue(np.allclose(srcGrid.cellsPerExtent, decGrid.cellsPerExtent))
+
+    def test_decimate2x2x2CellTwoDecimation(self):
+        # GIVEN
+        srcGrid = UniformGrid(8, np.zeros(3), 2*np.ones(3), False)
+        decGrid = UniformGrid()
+
+        # WHEN
+        decGrid.decimate(srcGrid, 2)
+
+        # THEN
+        self.assertTrue(np.allclose(srcGrid.gridExtent, decGrid.gridExtent))
+        self.assertTrue(np.allclose(srcGrid.minCorner, decGrid.minCorner))
+        self.assertTrue(np.allclose(2*np.ones(3), decGrid.numPoints))
+        self.assertTrue(np.allclose(2*np.ones(3), decGrid.cellExtent))
+        self.assertTrue(np.allclose(0.5*np.ones(3), decGrid.cellsPerExtent))
+
 if __name__ == '__main__':
     unittest.main()
