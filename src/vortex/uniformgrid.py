@@ -18,7 +18,7 @@ class UniformGrid(UniformGridGeometry):
         super(UniformGrid, self).__init__(numElements, vMin, vMax, powerOf2)
 
     def initialize(self, defaultValue=None):
-        self.contents = [defaultValue] * self.getGridCapacity()
+        self.contents = [np.copy(defaultValue) for i in range(self.getGridCapacity())]
 
     def defineShape(self, numElements, vMin, vMax, powerOf2):
         assert isinstance(numElements, int), "numElements must be an integer"
@@ -66,28 +66,44 @@ class UniformGrid(UniformGridGeometry):
         offsetX0Y1Z1  = offsetX0Y0Z0 + numXY + self.numPoints[0] 
         offsetX1Y1Z1  = offsetX0Y0Z0 + numXY + self.numPoints[0] + 1
         
-        return  ( oneMinusTween[0] * oneMinusTween[1] * oneMinusTween[2] * self.contents[ offsetX0Y0Z0 ]
-                +         tween[0] * oneMinusTween[1] * oneMinusTween[2] * self.contents[ offsetX1Y0Z0 ]
-                + oneMinusTween[0] *         tween[1] * oneMinusTween[2] * self.contents[ offsetX0Y1Z0 ]
-                +         tween[0] *         tween[1] * oneMinusTween[2] * self.contents[ offsetX1Y1Z0 ]
-                + oneMinusTween[0] * oneMinusTween[1] *         tween[2] * self.contents[ offsetX0Y0Z1 ]
-                +         tween[0] * oneMinusTween[1] *         tween[2] * self.contents[ offsetX1Y0Z1 ]
-                + oneMinusTween[0] *         tween[1] *         tween[2] * self.contents[ offsetX0Y1Z1 ]
-                +         tween[0] *         tween[1] *         tween[2] * self.contents[ offsetX1Y1Z1 ] )
-
+        result = ( oneMinusTween[0] * oneMinusTween[1] * oneMinusTween[2] * self.contents[ offsetX0Y0Z0 ]
+                 +         tween[0] * oneMinusTween[1] * oneMinusTween[2] * self.contents[ offsetX1Y0Z0 ]
+                 + oneMinusTween[0] *         tween[1] * oneMinusTween[2] * self.contents[ offsetX0Y1Z0 ]
+                 +         tween[0] *         tween[1] * oneMinusTween[2] * self.contents[ offsetX1Y1Z0 ]
+                 + oneMinusTween[0] * oneMinusTween[1] *         tween[2] * self.contents[ offsetX0Y0Z1 ]
+                 +         tween[0] * oneMinusTween[1] *         tween[2] * self.contents[ offsetX1Y0Z1 ]
+                 + oneMinusTween[0] *         tween[1] *         tween[2] * self.contents[ offsetX0Y1Z1 ]
+                 +         tween[0] *         tween[1] *         tween[2] * self.contents[ offsetX1Y1Z1 ] )
+        logger.debug("result = %s" % str(result))
+        return result
 
     def insert(self, position, item):
         au.assertVec3(position, "position")
         self.assertInitialized()
 
+        logger.debug("insert(position = %s, item = %s) called" % (position, str(item)))
+
         indices = self.indicesOfPosition(position)
+        logger.debug("indices = %s" % indices)
+
         minCorner = self.positionFromIndices(indices)
+        logger.debug("minCorner = %s" % minCorner)
 
         offsetX0Y0Z0 = self.offsetFromIndices(indices)
+        logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
+
         diff = position - minCorner
+        logger.debug("diff = %s" % diff)
+
         tween = diff * self.cellsPerExtent
+        logger.debug("tween = %s" % tween)
+
         oneMinusTween = np.ones(3) - tween
+        logger.debug("oneMinusTween = %s" % oneMinusTween)
+
         numXY = np.prod(self.numPoints[:2])
+        logger.debug("numXY = %s" % numXY)
+
         offsetX1Y0Z0  = offsetX0Y0Z0 + 1 
         offsetX0Y1Z0  = offsetX0Y0Z0 + self.numPoints[0] 
         offsetX1Y1Z0  = offsetX0Y0Z0 + self.numPoints[0] + 1 
@@ -96,14 +112,14 @@ class UniformGrid(UniformGridGeometry):
         offsetX0Y1Z1  = offsetX0Y0Z0 + numXY + self.numPoints[0] 
         offsetX1Y1Z1  = offsetX0Y0Z0 + numXY + self.numPoints[0] + 1
 
-        self.contents[ offsetX0Y0Z0 ] += oneMinusTween[0] * oneMinusTween[1] * oneMinusTween[2] * item ;
-        self.contents[ offsetX1Y0Z0 ] +=         tween[0] * oneMinusTween[1] * oneMinusTween[2] * item ;
-        self.contents[ offsetX0Y1Z0 ] += oneMinusTween[0] *         tween[1] * oneMinusTween[2] * item ;
-        self.contents[ offsetX1Y1Z0 ] +=         tween[0] *         tween[1] * oneMinusTween[2] * item ;
-        self.contents[ offsetX0Y0Z1 ] += oneMinusTween[0] * oneMinusTween[1] *         tween[2] * item ;
-        self.contents[ offsetX1Y0Z1 ] +=         tween[0] * oneMinusTween[1] *         tween[2] * item ;
-        self.contents[ offsetX0Y1Z1 ] += oneMinusTween[0] *         tween[1] *         tween[2] * item ;
-        self.contents[ offsetX1Y1Z1 ] +=         tween[0] *         tween[1] *         tween[2] * item ;
+        self.contents[ offsetX0Y0Z0 ] += oneMinusTween[0] * oneMinusTween[1] * oneMinusTween[2] * item 
+        self.contents[ offsetX1Y0Z0 ] +=         tween[0] * oneMinusTween[1] * oneMinusTween[2] * item 
+        self.contents[ offsetX0Y1Z0 ] += oneMinusTween[0] *         tween[1] * oneMinusTween[2] * item 
+        self.contents[ offsetX1Y1Z0 ] +=         tween[0] *         tween[1] * oneMinusTween[2] * item 
+        self.contents[ offsetX0Y0Z1 ] += oneMinusTween[0] * oneMinusTween[1] *         tween[2] * item 
+        self.contents[ offsetX1Y0Z1 ] +=         tween[0] * oneMinusTween[1] *         tween[2] * item 
+        self.contents[ offsetX0Y1Z1 ] += oneMinusTween[0] *         tween[1] *         tween[2] * item 
+        self.contents[ offsetX1Y1Z1 ] +=         tween[0] *         tween[1] *         tween[2] * item 
 
     def clear(self):
         self.contents = []
@@ -115,5 +131,5 @@ class UniformGrid(UniformGridGeometry):
     def __getitem__(self, index):
         return self.contents[index]
 
-    def __getitem__(self, index, value):
+    def __setitem__(self, index, value):
         self.contents[index] = value

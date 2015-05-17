@@ -33,7 +33,7 @@ class UniformGridTest(unittest.TestCase):
     def test_insert2x2x2Simple(self):
         # GIVEN
         grid = UniformGrid(1, np.zeros(3), np.ones(3), False)
-        grid.initialize(0)
+        grid.initialize(0.0)
         
         # WHEN
         grid.insert(np.ones(3), 1)
@@ -50,7 +50,7 @@ class UniformGridTest(unittest.TestCase):
     def test_insert2x2x2Interpolated(self):
         # GIVEN
         grid = UniformGrid(1, np.zeros(3), np.ones(3), False)
-        grid.initialize(0)
+        grid.initialize(0.0)
         
         # WHEN
         grid.insert(0.5 * np.ones(3), 1)
@@ -65,7 +65,7 @@ class UniformGridTest(unittest.TestCase):
     def test_insert3x3(self):
         # GIVEN
         grid = UniformGrid(8, np.zeros(3), 2*np.ones(3), False)
-        grid.initialize(0)
+        grid.initialize(0.0)
         
         # WHEN
         grid.insert(np.ones(3), 1)
@@ -84,7 +84,7 @@ class UniformGridTest(unittest.TestCase):
     def test_insert2x2x3(self):
         # GIVEN
         grid = UniformGrid(2, np.zeros(3), np.array([1, 1, 2]), False)
-        grid.initialize(0)
+        grid.initialize(0.0)
         
         # WHEN
         grid.insert(np.ones(3), 1)
@@ -104,8 +104,8 @@ class UniformGridTest(unittest.TestCase):
     def test_interpolate2x2(self):
         # GIVEN
         grid = UniformGrid(1, np.zeros(3), np.ones(3), False)
-        grid.initialize(0)
-        grid.insert(np.ones(3), 1)
+        grid.initialize(0.0)
+        grid.insert(np.ones(3), 1.0)
 
         # THEN
         for coord in itertools.product(range(grid.numPoints[0]), range(grid.numPoints[1]), range(grid.numPoints[2])):
@@ -161,6 +161,29 @@ class UniformGridTest(unittest.TestCase):
         self.assertTrue(np.allclose(0.25, grid.interpolate(np.array([1, 1.5, 1.5]))))
         self.assertTrue(np.allclose(0.125, grid.interpolate(np.array([1.5, 1.5, 1.5]))))
 
+    def test_interpolate2x2Vector(self):
+        # GIVEN
+        grid = UniformGrid(1, np.zeros(3), np.ones(3), False)
+        grid.initialize(np.zeros(3))
+        grid.insert(np.ones(3), np.ones(3))
+
+        # THEN
+        for coord in itertools.product(range(grid.numPoints[0]), range(grid.numPoints[1]), range(grid.numPoints[2])):
+            npCoord = np.array(coord)
+            if coord == (1, 1, 1):
+                self.assertTrue(np.allclose(np.ones(3), grid.interpolate(npCoord)))
+            else:
+                self.assertTrue(np.allclose(np.zeros(3), grid.interpolate(npCoord)))
+
+        self.assertTrue(np.allclose(0.5*np.ones(3), grid.interpolate(np.array([0.5, 1, 1]))))
+        self.assertTrue(np.allclose(0.5*np.ones(3), grid.interpolate(np.array([1, 0.5, 1]))))
+        self.assertTrue(np.allclose(0.5*np.ones(3), grid.interpolate(np.array([1, 1, 0.5]))))
+        self.assertTrue(np.allclose(0.25*np.ones(3), grid.interpolate(np.array([0.5, 0.5, 1]))))
+        self.assertTrue(np.allclose(0.25*np.ones(3), grid.interpolate(np.array([0.5, 1, 0.5]))))
+        self.assertTrue(np.allclose(0.25*np.ones(3), grid.interpolate(np.array([1, 0.5, 0.5]))))
+        self.assertTrue(np.allclose(0.125*np.ones(3), grid.interpolate(np.array([0.5, 0.5, 0.5]))))
+
+
     def test_decimateSingleCellUnitDecimation(self):
         # GIVEN
         srcGrid = UniformGrid(1, np.zeros(3), np.ones(3), False)
@@ -190,6 +213,35 @@ class UniformGridTest(unittest.TestCase):
         self.assertTrue(np.allclose(2*np.ones(3), decGrid.numPoints))
         self.assertTrue(np.allclose(2*np.ones(3), decGrid.cellExtent))
         self.assertTrue(np.allclose(0.5*np.ones(3), decGrid.cellsPerExtent))
+
+    def test_getitem(self):
+        # GIVEN
+        grid = UniformGrid(8, np.zeros(3), 2*np.ones(3), False)
+        grid.initialize(0.0)
+        grid.insert(np.ones(3), 1)
+
+        # THEN
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([0,0,0]))]))
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([1,0,0]))]))
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([0,1,0]))]))
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([0,0,1]))]))
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([1,1,0]))]))
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([0,1,1]))]))
+        self.assertTrue(np.allclose(0, grid[grid.offsetFromIndices(np.array([1,0,1]))]))
+        self.assertTrue(np.allclose(1, grid[grid.offsetFromIndices(np.array([1,1,1]))]))
+
+    def test_setitem(self):
+        # GIVEN
+        grid = UniformGrid(8, np.zeros(3), 2*np.ones(3), False)
+        grid.initialize(0.0)
+
+        # WHEN
+        grid[0] = 1
+        grid[1] = 2
+
+        # THEN
+        self.assertEqual(1, grid[0])
+        self.assertEqual(2, grid[1])
 
 if __name__ == '__main__':
     unittest.main()
