@@ -46,6 +46,21 @@ def computeJacobian(jacobian, vectorGrid):
                 index[0]        + offsetY0ZM,
                 index[0]        + offsetY0ZP)
 
+    def printOffsets():
+        logger.debug("index = %s" % index)
+        logger.debug("offsetXMY0Z0 = %s" % offsetXMY0Z0)
+        logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
+        logger.debug("offsetXPY0Z0 = %s" % offsetXPY0Z0)
+
+        logger.debug("offsetX0YMZ0 = %s" % offsetX0YMZ0)
+        logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
+        logger.debug("offsetX0YPZ0 = %s" % offsetX0YPZ0)
+
+        logger.debug("offsetX0Y0ZM = %s" % offsetX0Y0ZM)
+        logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
+        logger.debug("offsetX0Y0ZP = %s" % offsetX0Y0ZP)
+
+
     index = np.zeros(3).astype(int)
     for index[2] in range(1, dimsMinus1[2]):
         offsetZM, offsetZ0, offsetZP = assignZOffsets()
@@ -59,18 +74,8 @@ def computeJacobian(jacobian, vectorGrid):
                  offsetX0YMZ0, offsetX0YPZ0, offsetX0Y0ZM, 
                  offsetX0Y0ZP) = assignXYZOffsets()
 
-                logger.debug("offsetXMY0Z0 = %s" % offsetXMY0Z0)
-                logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
-                logger.debug("offsetXPY0Z0 = %s" % offsetXPY0Z0)
-
-                logger.debug("offsetX0YMZ0 = %s" % offsetX0YMZ0)
-                logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
-                logger.debug("offsetX0YPZ0 = %s" % offsetX0YPZ0)
-
-                logger.debug("offsetX0Y0ZM = %s" % offsetX0Y0ZM)
-                logger.debug("offsetX0Y0Z0 = %s" % offsetX0Y0Z0)
-                logger.debug("offsetX0Y0ZP = %s" % offsetX0Y0ZP)
-
+                printOffsets()
+                
                 matrix = jacobian[offsetX0Y0Z0]
                 matrix[0] = (vectorGrid[offsetXPY0Z0] - vectorGrid[offsetXMY0Z0]) * halfReciprocalCellExtent[0]
                 matrix[1] = (vectorGrid[offsetX0YPZ0] - vectorGrid[offsetX0YMZ0]) * halfReciprocalCellExtent[1]
@@ -102,6 +107,8 @@ def computeJacobian(jacobian, vectorGrid):
             (offsetX0Y0Z0, offsetXMY0Z0, offsetXPY0Z0, 
              offsetX0YMZ0, offsetX0YPZ0, offsetX0Y0ZM, 
              offsetX0Y0ZP) = assignXYZOffsets()
+
+            computeFiniteDiff()
    
     index[1] = 0
     for index[2] in range(dims[2]):
@@ -142,6 +149,8 @@ def computeJacobian(jacobian, vectorGrid):
             (offsetX0Y0Z0, offsetXMY0Z0, offsetXPY0Z0, 
              offsetX0YMZ0, offsetX0YPZ0, offsetX0Y0ZM, 
              offsetX0Y0ZP) = assignXYZOffsets()
+
+            computeFiniteDiff()
    
     index[1] = dimsMinus1[1]
     for index[2] in range(dims[2]):
